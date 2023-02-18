@@ -11,7 +11,7 @@ import routerProvider from "@pankod/refine-react-router-v6";
 import axios, { AxiosRequestConfig } from "axios";
 import { ColorModeContextProvider } from "contexts";
 import { Title, Sider, Layout, Header } from "components/layout"
-import { Login, Home, Agents, MyProfile, PropertyDetails, AllProperties, CreateProperty, AgentProfile, EditProperty } from "pages/login";
+import { Login, Home, Agents, MyProfile, PropertyDetails, AllProperties, CreateProperty, AgentProfile, EditProperty } from "pages";
 import { CredentialResponse } from "interfaces/google";
 import { parseJwt } from "utils/parse-jwt";
 
@@ -32,59 +32,54 @@ return request;
 
 
 function App() {
-    
+    const authProvider: AuthProvider = {
+        login: ({ credential }: CredentialResponse) => {
+            const profileObj = credential ? parseJwt(credential) : null;
 
-    
-            const authProvider: AuthProvider = {
-                login: ({ credential }: CredentialResponse) => {
-                    const profileObj = credential ? parseJwt(credential) : null;
-        
-                    if (profileObj) {
-                        localStorage.setItem(
-                            "user",
-                            JSON.stringify({
-                                ...profileObj,
-                                avatar: profileObj.picture,
-                            }),
-                        );
-                    }
-            
-localStorage.setItem("token", `${credential}`);
+            if (profileObj) {
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                        ...profileObj,
+                        avatar: profileObj.picture,
+                    }),
+                );
+            }
+            localStorage.setItem("token", `${credential}`);
+            return Promise.resolve();
+        },
+        logout: () => {
+            const token = localStorage.getItem("token");
 
+            if (token && typeof window !== "undefined") {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                axios.defaults.headers.common = {};
+                window.google?.accounts.id.revoke(token, () => {
                     return Promise.resolve();
-                },
-                logout: () => {
-                    const token = localStorage.getItem("token");
+                });
+            }
+
+            return Promise.resolve();
+        },
+        checkError: () => Promise.resolve(),
+        checkAuth: async () => {
+            const token = localStorage.getItem("token");
+
+            if (token) {
+                return Promise.resolve();
+            }
+            return Promise.reject();
+        },
         
-                    if (token && typeof window !== "undefined") {
-                        localStorage.removeItem("token");
-                        localStorage.removeItem("user");
-                        axios.defaults.headers.common = {};
-                        window.google?.accounts.id.revoke(token, () => {
-                            return Promise.resolve();
-                        });
-                    }
-        
-                    return Promise.resolve();
-                },
-                checkError: () => Promise.resolve(),
-                checkAuth: async () => {
-                    const token = localStorage.getItem("token");
-        
-                    if (token) {
-                        return Promise.resolve();
-                    }
-                    return Promise.reject();
-                },
-        
-                getPermissions: () => Promise.resolve(),
-                getUserIdentity: async () => {
-                    const user = localStorage.getItem("user");
-                    if (user) {
-                        return Promise.resolve(JSON.parse(user));
-                    }
-                },
-            };
+        getPermissions: () => Promise.resolve(),
+        getUserIdentity: async () => {
+            const user = localStorage.getItem("user");
+            if (user) {
+                return Promise.resolve(JSON.parse(user));
+            }
+        },
+    };
         
             
     
@@ -98,33 +93,33 @@ localStorage.setItem("token", `${credential}`);
                     ReadyPage={ReadyPage}
                     catchAll={<ErrorComponent />}
                     resources={[
-                                        {
-                                            name: "property",
-                                            list: MuiInferencer,
-                                            icon: <VillaOutlined />
-                                        },
-                                        {
-                                            name: "agent",
-                                            list: MuiInferencer,
-                                            icon: <PeopleAltOutlined />
-                                        },
-                                        {
-                                            name: "review",
-                                            list: MuiInferencer,
-                                            icon: <StarOutlineRounded />
-                                        },
-                                        {
-                                            name: "message",
-                                            list: MuiInferencer,
-                                            icon: <ChatBubbleOutline />
-                                        },
-                                        {
-                                            name: "my-profile",
-                                            options: { label: 'My Profile' },
-                                            list: MuiInferencer,
-                                            icon: <AccountCircleOutlined />
-                                        },
-                                    ]}
+                        {
+                            name: "property",
+                            list: MuiInferencer,
+                            icon: <VillaOutlined />
+                        },
+                        {
+                            name: "agent",
+                            list: MuiInferencer,
+                            icon: <PeopleAltOutlined />
+                        },
+                        {
+                            name: "review",
+                            list: MuiInferencer,
+                            icon: <StarOutlineRounded />
+                        },
+                        {
+                            name: "message",
+                            list: MuiInferencer,
+                            icon: <ChatBubbleOutline />
+                        },
+                        {
+                            name: "my-profile",
+                            options: { label: 'My Profile' },
+                            list: MuiInferencer,
+                            icon: <AccountCircleOutlined />
+                        },
+                    ]}
                     Title={Title}
                     Sider={Sider}
                     Layout={Layout}
@@ -132,7 +127,7 @@ localStorage.setItem("token", `${credential}`);
                     routerProvider={routerProvider}
                     authProvider={authProvider}
                     LoginPage={Login} 
-
+                    DashboardPage={Home}
                 />
             </RefineSnackbarProvider>
 
