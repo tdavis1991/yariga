@@ -15,9 +15,30 @@ cloudinary.config({
 })
 
 const getAllProperties = async (req, res) => {
+  const { _end, _order, _start, _sort, title_like = '', propertyType= '' } = req.query;
+
+  const query = {};
+
+  if(propertyType !== '') {
+    query.propertyType = propertyType;
+  }
+
+  if(title_like) {
+    query.title = { $regex: title_like, $option: 'i' }
+  }
+
   try {
-    // Get all properties of current user and limit is how ever many properties the user has
-    const properties = await Property.find({}).limit(req.query._end);
+    const count = await Property.countDocuments({ query });
+
+    // Get all properties of current user or how many they filter
+    const properties = await Property
+      .find(query)
+      .limit(_end)
+      .skip(_start)
+      .sort({ [_sort]: _order })
+
+    res.header('x-total-count', count);
+    res.header('Access-Control-Expose-Headers', 'x-total-count')
 
     //return a success status and properties
     res.status(200).json(properties);
