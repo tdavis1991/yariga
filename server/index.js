@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
   res.send({ message: 'Hello World!' });
 });
 
+//when deploying remove api/v1 from users
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/properties', propertyRouter);
 

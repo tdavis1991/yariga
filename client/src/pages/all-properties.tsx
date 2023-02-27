@@ -1,4 +1,5 @@
-import { Add } from '@mui/icons-material';
+import { useMemo } from 'react';
+import { Add, Apartment } from '@mui/icons-material';
 import { useTable } from '@pankod/refine-core';
 import { Box, Stack, TextField, Typography, Select, MenuItem } from '@pankod/refine-mui';
 import { useNavigate } from '@pankod/refine-react-router-v6';
@@ -29,6 +30,17 @@ const AllProperties = () => {
     setSorter([{ field, order: currentPrice === 'asc' ? 'desc' : 'asc' }])
   }
 
+  const currentFilterValues = useMemo(() => {
+    const logicalFilters = filters.flatMap((item) => (
+      'field' in item ? item : []
+    ));
+
+    return {
+      title: logicalFilters.find((item) => item.field === 'title')?.value || '',
+      propertyType: logicalFilters.find((item) => item.field === 'propertyType')?.value || '',
+    }
+  }, [filters])
+
   if(isLoading) return <Typography>Loading...</Typography>
   if(isError) return <Typography>Error...</Typography>
 
@@ -51,8 +63,16 @@ const AllProperties = () => {
                 variant='outlined'
                 color='info'
                 placeholder='Search By Title'
-                value=''
-                onChange={() => {}}
+                value={currentFilterValues.title}
+                onChange={(e) => {
+                  setFilters([
+                    {
+                      field: 'title',
+                      operator: 'contains',
+                      value: e.currentTarget.value ? e.currentTarget.value : undefined
+                    }
+                  ])
+                }}
               />
               <Select 
                 variant='outlined'
@@ -61,10 +81,26 @@ const AllProperties = () => {
                 required
                 inputProps={{ 'aria-label': 'Without label' }}
                 defaultValue=''
-                value=''
-                onChange={() => {}}
+                value={currentFilterValues.propertyType}
+                onChange={(e) => {
+                  setFilters([
+                    {
+                      field: 'propertyType',
+                      operator: 'eq',
+                      value: e.target.value
+                    }
+                  ], 'replace')
+                }}
               >
                 <MenuItem value=''>All</MenuItem>
+                {['Apartment', 'Villa', 'Condo', 'Townhouse', 'Studio', 'Duplex', 'Chalet'].map((type) => (
+                  <MenuItem 
+                    key={type}
+                    value={type.toLowerCase()} 
+                  >
+                    {type}
+                  </MenuItem>
+                ))}
               </Select>
             </Box>
           </Box>
@@ -120,8 +156,7 @@ const AllProperties = () => {
             required
             inputProps={{ 'aria-label': 'Without label' }}
             defaultValue={10}
-            value=''
-            onChange={() => {}}
+            onChange={(e) => setPageSize(e.target.value ? Number(e.target.value) : 10)}
           >
             {[10, 20, 30, 40, 50].map((size) => (
               <MenuItem key={size} value={size}>{size}</MenuItem>
