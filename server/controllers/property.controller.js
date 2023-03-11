@@ -119,6 +119,7 @@ const updateProperty = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 };
+
 const deleteProperty = async (req, res) => {
   try {
     const { id } = req.params
