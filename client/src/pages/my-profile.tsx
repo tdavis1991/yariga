@@ -6,7 +6,7 @@ const MyProfile = () => {
   const { data: user } = useGetIdentity();
   const { data, isLoading, isError } = useOne({
     resource: 'users',
-    id: user.userid,
+    id: user?.userid,
   });
 
   const myProfile = data?.data ?? [];
