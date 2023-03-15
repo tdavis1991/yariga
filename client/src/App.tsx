@@ -1,6 +1,7 @@
 import { Refine, AuthProvider} from '@pankod/refine-core';
 import { notificationProvider, RefineSnackbarProvider, CssBaseline, GlobalStyles, ReadyPage, ErrorComponent} from '@pankod/refine-mui';
 
+
 import { AccountCircleOutlined, ChatBubbleOutline, PeopleAltOutlined, StarOutlineRounded, VillaOutlined } from "@mui/icons-material";
 
 import dataProvider from "@pankod/refine-simple-rest";
@@ -9,7 +10,7 @@ import routerProvider from "@pankod/refine-react-router-v6";
 import axios, { AxiosRequestConfig } from "axios";
 import { ColorModeContextProvider } from "contexts";
 import { Title, Sider, Layout, Header } from "components/layout"
-import { Login, Home, Agents, MyProfile, PropertyDetails, AllProperties, CreateProperty, AgentProfile, EditProperty } from "pages";
+import { Login, Home, Agents, MyProfile, PropertyDetails, AllProperties, CreateProperty, AgentProfile, EditProperty, Messages } from "pages";
 import { CredentialResponse } from "interfaces/google";
 import { parseJwt } from "utils/parse-jwt";
 
@@ -26,6 +27,8 @@ if (request.headers) {
 
 return request;
 });
+
+
 
 
 
@@ -130,7 +133,7 @@ function App() {
                         },
                         {
                             name: "messages",
-                            list: Home,
+                            list: Messages,
                             icon: <ChatBubbleOutline />
                         },
                         {
