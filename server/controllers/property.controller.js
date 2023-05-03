@@ -8,11 +8,11 @@ import User from '../mongodb/models/user.js';
 dotenv.config();
 
 // setting up cloudinary config for photos
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+// cloudinary.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// })
 
 const getAllProperties = async (req, res) => {
   const { _end, _order, _start, _sort, title_like = '', propertyType= '' } = req.query;
@@ -71,7 +71,7 @@ const createProperty = async (req, res) => {
 
     if(!user) throw new Error('User not found');
 
-    const photoUrl = await cloudinary.uploader.upload(photo);
+    // const photoUrl = await cloudinary.uploader.upload(photo);
 
     const newProperty = await Property.create({ 
       title, 
@@ -79,7 +79,7 @@ const createProperty = async (req, res) => {
       propertyType, 
       location, 
       price, 
-      photo: photoUrl.url, 
+      photo, 
       creator: user._id 
     });
 
@@ -103,7 +103,7 @@ const updateProperty = async (req, res) => {
 
     const { title, description, propertyType, location, price, photo } = req.body;
 
-    const photoUrl = await cloudinary.uploader.upload(photo)
+    // const photoUrl = await cloudinary.uploader.upload(photo)
 
     await Property.findByIdAndUpdate({ _id: id }, {
       title, 

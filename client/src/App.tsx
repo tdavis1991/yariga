@@ -133,7 +133,7 @@ function App() {
                         },
                         {
                             name: "messages",
-                            list: Messages,
+                            list: Home,
                             icon: <ChatBubbleOutline />
                         },
                         {
