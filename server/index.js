@@ -20,8 +20,8 @@ app.get('/', (req, res) => {
 });
 
 //when deploying remove api/v1 from users
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/properties', propertyRouter);
+app.use('/users', userRouter);
+app.use('/properties', propertyRouter);
 
 //server for mongodb
 const startServer = async () => {
